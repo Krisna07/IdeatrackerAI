@@ -1,28 +1,46 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { IdeaCard } from './components/IdeaCard';
-import { AddIdeaForm } from './components/AddIdeaForm';
-import { Idea, Subtask } from './types';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import AddIdeaForm from "./components/AddIdeaForm";
+import Navbar from "./components/Navbar";
+import { Idea, Subtask, Breakdown } from "./types";
+import { IdeaCard } from "./components/IdeaCard";
 
-const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 if (!API_KEY) {
-  throw new Error('Missing Gemini API key - please add it to .env.local file');
+  throw new Error("Missing Gemini API key - please add it to .env file");
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 export default function Home() {
-  const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [ideas, setIdeas] = useState<Idea[]>(() => {
+    const savedIdeas = localStorage.getItem("ideas");
+    return savedIdeas ? JSON.parse(savedIdeas) : [];
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [breakdowns, setBreakdowns] = useState<{ [key: number]: Breakdown }>(
+    () => {
+      const savedBreakdowns = localStorage.getItem("breakdowns");
+      return savedBreakdowns ? JSON.parse(savedBreakdowns) : {};
+    }
+  );
+
+  useEffect(() => {
+    localStorage.setItem("ideas", JSON.stringify(ideas));
+  }, [ideas]);
+
+  useEffect(() => {
+    localStorage.setItem("breakdowns", JSON.stringify(breakdowns));
+  }, [breakdowns]);
 
   const generateSubtasks = async (
     title: string,
     description: string
   ): Promise<Subtask[]> => {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
       const prompt = `Based on the following project idea, generate 6 detailed subtasks. For each subtask, provide both a title and a brief description of what needs to be done. Format your response exactly like this example:
 
@@ -41,19 +59,19 @@ Please ensure each subtask is specific, actionable, and directly contributes to 
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
-      const text = response.text();
+      const text = await response.text();
 
       if (!text) {
-        throw new Error('No response from Gemini AI');
+        throw new Error("No response from Gemini AI");
       }
 
       const subtasksList = text
-        .split('\n')
+        .split("\n")
         .filter((task) => task.trim() && task.match(/^\d+\./))
         .map((task) => {
-          const [title, description = ''] = task
-            .replace(/^\d+\.\s*/, '')
-            .split('|')
+          const [title, description = ""] = task
+            .replace(/^\d+\.\s*/, "")
+            .split("|")
             .map((s) => s.trim());
 
           return {
@@ -66,19 +84,19 @@ Please ensure each subtask is specific, actionable, and directly contributes to 
         .filter((task) => task.title.length > 0);
 
       if (subtasksList.length === 0) {
-        throw new Error('Failed to parse subtasks from response');
+        throw new Error("Failed to parse subtasks from response");
       }
 
       return subtasksList;
     } catch (error) {
-      console.error('Error generating subtasks:', error);
+      console.error("Error generating subtasks:", error);
       throw error;
     }
   };
 
   const addIdea = async (title: string, description: string) => {
     if (!title.trim()) {
-      setError('Please enter a title');
+      setError("Please enter a title");
       return;
     }
 
@@ -92,7 +110,7 @@ Please ensure each subtask is specific, actionable, and directly contributes to 
         id: Date.now(),
         title,
         description,
-        status: 'Not Started',
+        status: "Not Started",
         progress: 0,
         subtasks,
       };
@@ -100,7 +118,7 @@ Please ensure each subtask is specific, actionable, and directly contributes to 
       setIdeas([...ideas, newIdea]);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Failed to generate subtasks'
+        err instanceof Error ? err.message : "Failed to generate subtasks"
       );
     } finally {
       setLoading(false);
@@ -124,10 +142,10 @@ Please ensure each subtask is specific, actionable, and directly contributes to 
           );
           const status =
             progress === 100
-              ? 'Completed'
+              ? "Completed"
               : progress === 0
-              ? 'Not Started'
-              : 'In Progress';
+              ? "Not Started"
+              : "In Progress";
 
           return { ...idea, subtasks: updatedSubtasks, progress, status };
         }
@@ -136,27 +154,63 @@ Please ensure each subtask is specific, actionable, and directly contributes to 
     );
   };
 
+  const generateBreakdown = async (subtask: Subtask): Promise<void> => {
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const result = await model.generateContent(
+        `Breakdown for: ${subtask.title}`
+      );
+      const response = await result.response;
+      const text = await response.text();
+      console.log("Breakdown:", text);
+
+      setBreakdowns((prevBreakdowns) => ({
+        ...prevBreakdowns,
+        [subtask.id]: { subtask: subtask.title, details: text },
+      }));
+    } catch (error) {
+      console.error("Error generating breakdown:", error);
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-8">
-        Idea Progress Tracker
-      </h1>
+    <>
+      <Navbar />
+      <div className="container mx-auto px-4 py-8 grid place-items-center">
+        <h1 className="text-4xl font-bold text-center mb-8">
+          Idea Progress Tracker
+        </h1>
 
-      <AddIdeaForm onAddIdea={addIdea} loading={loading} error={error} />
+        <AddIdeaForm onAddIdea={addIdea} loading={loading} error={error} />
 
-      <AnimatePresence>
-        {ideas.map((idea) => (
-          <motion.div
-            key={idea.id}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.5 }}
+        <AnimatePresence>
+          <div
+            style={{
+              gridTemplateColumns: `repeat(${
+                ideas.length < 3 ? ideas.length : 3
+              }, 1fr)`,
+            }}
+            className={`w-full sm:grid grid-cols-1  gap-4`}
           >
-            <IdeaCard idea={idea} onToggleSubtask={toggleSubtask} />
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
+            {ideas.map((idea) => (
+              <motion.div
+                key={idea.id}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+                transition={{ duration: 0.5 }}
+              >
+                <IdeaCard
+                  idea={idea}
+                  onToggleSubtask={toggleSubtask}
+                  onGenerateBreakdown={generateBreakdown}
+                  breakdowns={breakdowns}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </AnimatePresence>
+      </div>
+    </>
   );
 }
