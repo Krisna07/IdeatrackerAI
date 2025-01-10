@@ -86,7 +86,27 @@ export default function AddIdeaForm({
               loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
             } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
           >
-            {loading ? "Adding..." : "Add Idea"}
+            
+             <div className="rounded-full flex items-center gap-2">
+             Generating
+    <motion.div 
+    initial={{y:-4}}
+    animate={{
+      y:4
+    }}
+    transition={{ repeat: Infinity, duration: 1 }}
+    className="w-2 h-2 bg-gray-800 rounded-full "></motion.div>
+    <motion.div initial={{y:-4}}
+    animate={{
+      y:4
+    }}
+    transition={{type:"keyframe", repeat: Infinity, duration: 1,delay:0.2}} className="w-2 h-2 bg-gray-800 rounded-full "></motion.div>
+    <motion.div initial={{y:-4}}
+    animate={{
+      y:4
+    }}
+    transition={{ repeat: Infinity, duration: 1, dealy:0.3 }} className="w-2 h-2 bg-gray-800 rounded-full "></motion.div>
+  </div>
           </button>
         </div>
       </form>

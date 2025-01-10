@@ -40,22 +40,16 @@ export default function Home() {
     description: string
   ): Promise<Subtask[]> => {
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      const prompt = `Based on the following project idea, generate 6 detailed subtasks. For each subtask, provide both a title and a brief description of what needs to be done. Format your response exactly like this example:
-
-1. Task Title | Brief description explaining what needs to be done
-2. Task Title | Brief description explaining what needs to be done
-3. Task Title | Brief description explaining what needs to be done
-4. Task Title | Brief description explaining what needs to be done
-5. Task Title | Brief description explaining what needs to be done
-6. Task Title | Brief description explaining what needs to be done
-
-Project Details:
-Title: ${title}
-Description: ${description}
-
-Please ensure each subtask is specific, actionable, and directly contributes to completing the main idea. Use the project description to inform the detail and scope of each subtask.`;
+      const prompt = `
+      Based on the following project idea, generate required detailed subtasks and type for the project. For each subtask, provide both a title and a brief description of what needs to be done. Format each of your response exactly like this example:
+      1. Task Title | Brief description explaining what needs to be done
+      Project Details:
+      make please correct the spellings and grammer in both ${title} and ${description}.
+      Title: ${title}
+      Description: ${description}
+      Please ensure each subtask is specific, actionable, and directly contributes to completing the main idea. Use the project description to inform the detail and scope of each subtask.`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
@@ -105,7 +99,7 @@ Please ensure each subtask is specific, actionable, and directly contributes to 
 
     try {
       const subtasks = await generateSubtasks(title, description);
-
+      
       const newIdea: Idea = {
         id: Date.now(),
         title,
