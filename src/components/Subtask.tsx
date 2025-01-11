@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-import { RiGeminiFill, RiGeminiLine } from "react-icons/ri";
+import { RiGeminiLine } from "react-icons/ri";
 import { Idea, Subtask } from "../types";
 import ThreeDotsWave from "./Loaders/Threedotsloading";
 
