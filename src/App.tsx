@@ -1,17 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+
 import AddIdeaForm from "./components/AddIdeaForm";
 import Navbar from "./components/Navbar";
 import { Idea, Subtask, Breakdown } from "./types";
 import { IdeaCard } from "./components/IdeaCard";
-
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-if (!API_KEY) {
-  throw new Error("Missing Gemini API key - please add it to .env file");
-}
-
-const genAI = new GoogleGenerativeAI(API_KEY);
+import generate from "./utils/generate";
 
 export default function Home() {
   const [ideas, setIdeas] = useState<Idea[]>(() => {
@@ -20,70 +14,45 @@ export default function Home() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [breakdowns, setBreakdowns] = useState<{ [key: number]: Breakdown }>(
-    () => {
-      const savedBreakdowns = localStorage.getItem("breakdowns");
-      return savedBreakdowns ? JSON.parse(savedBreakdowns) : {};
-    }
-  );
 
   useEffect(() => {
     localStorage.setItem("ideas", JSON.stringify(ideas));
   }, [ideas]);
 
-  useEffect(() => {
-    localStorage.setItem("breakdowns", JSON.stringify(breakdowns));
-  }, [breakdowns]);
-
   const generateSubtasks = async (
     title: string,
-    description: string
+    description: string,
+    ideaId: number
   ): Promise<Subtask[]> => {
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const SubtaskObject: { title: string; description: string } = {
+        title: "",
+        description: "",
+      };
 
-      const prompt = `
-      Based on the following project idea, generate required detailed subtasks and type for the project. For each subtask, provide both a title and a brief description of what needs to be done. Format each of your response exactly like this example:
-      1. Task Title | Brief description explaining what needs to be done
-      Project Details:
-      make please correct the spellings and grammer in both ${title} and ${description}.
-      Title: ${title}
-      Description: ${description}
-      Please ensure each subtask is specific, actionable, and directly contributes to completing the main idea. Use the project description to inform the detail and scope of each subtask.`;
-
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = await response.text();
-
-      if (!text) {
-        throw new Error("No response from Gemini AI");
+      const prompt = `based on the title: ${title} and description: ${description} generate a list of subtasks that need to be done to meet the goal. Format it to meet the schema :
+      {
+      title: "this should be the title of the subtask",
+      description: "this should be the description of the subtask",
       }
+      `;
+      const response = await generate(prompt, SubtaskObject);
 
-      const subtasksList = text
-        .split("\n")
-        .filter((task) => task.trim() && task.match(/^\d+\./))
-        .map((task) => {
-          const [title, description = ""] = task
-            .replace(/^\d+\.\s*/, "")
-            .split("|")
-            .map((s) => s.trim());
+      const subtasksList: Subtask[] = response.map((item: Subtask) => {
+        const { title, description = "" } = item;
+        return {
+          ideaId: ideaId,
+          id: Math.floor(Math.random() * 100000),
+          title,
+          description,
+          completed: false,
+        };
+      });
 
-          return {
-            id: Date.now() + Math.random(),
-            title,
-            description,
-            completed: false,
-          };
-        })
-        .filter((task) => task.title.length > 0);
-
-      if (subtasksList.length === 0) {
-        throw new Error("Failed to parse subtasks from response");
-      }
-
+      console.log("Formatted Response Array:", subtasksList);
       return subtasksList;
     } catch (error) {
-      console.error("Error generating subtasks:", error);
+      console.error("Error parsing response:", error);
       throw error;
     }
   };
@@ -98,18 +67,24 @@ export default function Home() {
     setError(null);
 
     try {
-      const subtasks = await generateSubtasks(title, description);
-      
-      const newIdea: Idea = {
-        id: Date.now(),
+      const ideaId = Math.floor(Math.random() * 356662);
+      const subtasks: Subtask[] = await generateSubtasks(
         title,
         description,
-        status: "Not Started",
-        progress: 0,
-        subtasks,
-      };
-
-      setIdeas([...ideas, newIdea]);
+        ideaId
+      );
+      // setSubtasks(subtasks);
+      setIdeas((ideas) => [
+        ...ideas,
+        {
+          id: ideaId,
+          title,
+          description,
+          status: "Not Started",
+          progress: 0,
+          subtasks,
+        },
+      ]);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to generate subtasks"
@@ -149,19 +124,47 @@ export default function Home() {
   };
 
   const generateBreakdown = async (subtask: Subtask): Promise<void> => {
+    const prompt = `
+    Give a breakdown of the subtask: ${subtask.title}.
+    based on the subtask: ${subtask.title} generate a detailed breakdown of the steps required to complete it. Format the response to meet the schema:
+    {
+      details: "this should be a detailed breakdown of the subtask formatted as html just write inside a <div>  with headings, list and paragraphs use tailwind css to make it look better"
+    }
+    `;
+    const breakDownObject: { details: string } = { details: "" };
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const result = await model.generateContent(
-        `Breakdown for: ${subtask.title}`
-      );
-      const response = await result.response;
-      const text = await response.text();
-      console.log("Breakdown:", text);
+      const response = await generate(prompt, breakDownObject);
+      const breakdownList: Breakdown[] = response.map((item: Breakdown) => {
+        const { details = "" } = item;
+        return {
+          subtask: subtask.title,
+          details: details,
+        };
+      });
 
-      setBreakdowns((prevBreakdowns) => ({
-        ...prevBreakdowns,
-        [subtask.id]: { subtask: subtask.title, details: text },
-      }));
+      console.log("Formatted Response Array:", response);
+      setIdeas((ideas) =>
+        ideas.map((idea) => {
+          if (idea.id === subtask.ideaId) {
+            const updatedSubtasks = idea.subtasks.map((st: Subtask) =>
+              st.id === subtask.id
+                ? { ...st, breakdown: breakdownList[0].details }
+                : st
+            );
+            const updatedIdea = { ...idea, subtasks: updatedSubtasks };
+            localStorage.setItem(
+              "ideas",
+              JSON.stringify(
+                ideas.map((i) => (i.id === idea.id ? updatedIdea : i))
+              )
+            );
+            return updatedIdea;
+          }
+          return idea;
+        })
+      );
+
+      return;
     } catch (error) {
       console.error("Error generating breakdown:", error);
     }
@@ -198,7 +201,6 @@ export default function Home() {
                   idea={idea}
                   onToggleSubtask={toggleSubtask}
                   onGenerateBreakdown={generateBreakdown}
-                  breakdowns={breakdowns}
                 />
               </motion.div>
             ))}

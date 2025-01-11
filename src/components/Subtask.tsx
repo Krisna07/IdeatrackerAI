@@ -1,29 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-import { RiGeminiFill } from "react-icons/ri";
-import { Idea } from "../types";
+import { RiGeminiFill, RiGeminiLine } from "react-icons/ri";
+import { Idea, Subtask } from "../types";
+import ThreeDotsWave from "./Loaders/Threedotsloading";
 
 interface SubtaskProps {
   idea: Idea;
-  subtask: {
-    id: number;
-    title: string;
-    description: string;
-    completed: boolean;
-  };
+  subtask: Subtask;
   activeSubtask: number | null;
   onToggleSubtask: (ideaId: number, subtaskId: number) => void;
   handleSubtaskClick: (subtaskId: number) => void;
-  handleGenerateBreakdown: (subtask: {
-    id: number;
-    title: string;
-    description: string;
-    completed: boolean;
-  }) => void;
+  handleGenerateBreakdown: (subtask: Subtask) => void;
 }
 
-const Subtask = ({
+const SubtaskComponent = ({
   idea,
   subtask,
   activeSubtask,
@@ -32,12 +23,19 @@ const Subtask = ({
   handleGenerateBreakdown,
 }: SubtaskProps) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const [regenerate, setRegenerate] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (subtask.breakdown) {
+      setLoading(false);
+    }
+  }, [idea]);
+
   return (
     <>
       <motion.div
         key={subtask.id}
-        className="w-full flex items-center justify-between mb-2"
+        className="w-full flex items-center justify-between mb-2 p-2"
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
@@ -67,11 +65,20 @@ const Subtask = ({
           <button
             onClick={() => {
               handleGenerateBreakdown(subtask);
-              setRegenerate(true);
+              setLoading(true);
             }}
-            className="flex items-center bg-blue-300 rounded-md px-2 text-sm relative z-10 "
+            className="flex items-center  rounded-md px-2 text-sm relative z-10 shadow-[0_0_2px_0_gray] gap-2"
           >
-            {regenerate ? "Regenerate" : "AI"} <RiGeminiFill />
+            {loading ? (
+              <ThreeDotsWave />
+            ) : subtask.breakdown ? (
+              "Regenerate"
+            ) : (
+              "AI"
+            )}
+            <div className="">
+              <RiGeminiLine />
+            </div>
           </button>
           {showTooltip && (
             <div className="absolute z-20 right-0 mt-2 w-48  rounded-md shadow-lg   px-2 py-1 text-sm bg-slate-600 text-white">
@@ -84,4 +91,4 @@ const Subtask = ({
   );
 };
 
-export default Subtask;
+export default SubtaskComponent;

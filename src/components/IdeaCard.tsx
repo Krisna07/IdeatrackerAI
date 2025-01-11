@@ -1,22 +1,22 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Idea, Subtask as SubtaskType, Breakdown } from "../types";
-import Subtask from "./Subtask";
+import { Idea, Subtask } from "../types";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { TiTick } from "react-icons/ti";
+
+import SubtaskComponent from "./Subtask";
 
 interface IdeaCardProps {
   idea: Idea;
   onToggleSubtask: (ideaId: number, subtaskId: number) => void;
-  onGenerateBreakdown: (subtask: SubtaskType) => Promise<void>;
-  breakdowns: { [key: number]: Breakdown };
+  onGenerateBreakdown: (subtask: Subtask) => Promise<void>;
+  breakdown?: string;
 }
 
 export function IdeaCard({
   idea,
   onToggleSubtask,
   onGenerateBreakdown,
-  breakdowns,
 }: IdeaCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeSubtask, setActiveSubtask] = useState<number | null>(null);
@@ -35,29 +35,8 @@ export function IdeaCard({
     }));
   };
 
-  const renderBreakdown = (text: string) => {
-    const lines = text.split("\n").filter((line) => line.trim() !== "");
-    return lines.map((line, index) => {
-      if (line.startsWith("**")) {
-        return (
-          <h4 key={index} className="font-bold mt-2">
-            {line.replace(/\*\*/g, "")}
-          </h4>
-        );
-      } else if (line.startsWith("*")) {
-        return (
-          <li key={index} className="ml-4 list-disc">
-            {line.replace(/^\*\s*/, "")}
-          </li>
-        );
-      } else {
-        return (
-          <p key={index} className="mt-1">
-            {line}
-          </p>
-        );
-      }
-    });
+  const renderBreakdown = (html: string) => {
+    return <div dangerouslySetInnerHTML={{ __html: html }} />;
   };
 
   return (
@@ -81,7 +60,7 @@ export function IdeaCard({
         <div className="mt-4">
           <h3 className="text-lg font-semibold">Subtasks:</h3>
           <div className="mt-2 overflow-hidden">
-            {idea.subtasks.map((subtask, index) => (
+            {idea.subtasks.map((subtask: Subtask, index: number) => (
               <motion.div
                 initial={{ opacity: 0, x: "-100%" }}
                 animate={{ opacity: 1, x: 0 }}
@@ -92,7 +71,7 @@ export function IdeaCard({
                 key={subtask.id}
                 className=""
               >
-                <Subtask
+                <SubtaskComponent
                   idea={idea}
                   subtask={subtask}
                   activeSubtask={activeSubtask}
@@ -100,7 +79,7 @@ export function IdeaCard({
                   onToggleSubtask={onToggleSubtask}
                   handleGenerateBreakdown={onGenerateBreakdown}
                 />
-                {breakdowns[subtask.id] && (
+                {subtask.breakdown && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "fit-content", opacity: 1 }}
@@ -118,7 +97,7 @@ export function IdeaCard({
                       <>
                         <h3 className="text-lg font-semibold">Breakdown:</h3>
                         <div className="text-sm text-gray-700">
-                          {renderBreakdown(breakdowns[subtask.id].details)}
+                          {renderBreakdown(subtask.breakdown)}
                         </div>
                         <button
                           onClick={() => onToggleSubtask(idea.id, subtask.id)}

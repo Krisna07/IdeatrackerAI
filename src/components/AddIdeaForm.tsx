@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import ThreeDotsWave from "./Loaders/Threedotsloading";
 
 interface AddIdeaFormProps {
   onAddIdea: (title: string, description: string) => void;
@@ -33,7 +34,7 @@ export default function AddIdeaForm({
   };
 
   return (
-    <motion.div className="bg-white shadow-md rounded-lg p-6 mb-6 w-full max-w-md">
+    <motion.div className="bg-white shadow-[0_0_4px_0_gray] rounded-lg p-6 mb-6 w-full max-w-md">
       <h2 className="text-2xl font-bold mb-4 text-center">Add New Idea</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -86,27 +87,14 @@ export default function AddIdeaForm({
               loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
             } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
           >
-            
-             <div className="rounded-full flex items-center gap-2">
-             Generating
-    <motion.div 
-    initial={{y:-4}}
-    animate={{
-      y:4
-    }}
-    transition={{ repeat: Infinity, duration: 1 }}
-    className="w-2 h-2 bg-gray-800 rounded-full "></motion.div>
-    <motion.div initial={{y:-4}}
-    animate={{
-      y:4
-    }}
-    transition={{type:"keyframe", repeat: Infinity, duration: 1,delay:0.2}} className="w-2 h-2 bg-gray-800 rounded-full "></motion.div>
-    <motion.div initial={{y:-4}}
-    animate={{
-      y:4
-    }}
-    transition={{ repeat: Infinity, duration: 1, dealy:0.3 }} className="w-2 h-2 bg-gray-800 rounded-full "></motion.div>
-  </div>
+            {loading ? (
+              <div className="rounded-full flex items-center gap-2">
+                Generating
+                <ThreeDotsWave />
+              </div>
+            ) : (
+              "Add Idea"
+            )}
           </button>
         </div>
       </form>

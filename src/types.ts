@@ -1,8 +1,10 @@
 export interface Subtask {
   id: number;
+  ideaId: number;
   title: string;
   completed: boolean;
   description: string;
+  breakdown?: string | null;
 }
 
 export interface Idea {
@@ -15,6 +17,5 @@ export interface Idea {
 }
 
 export interface Breakdown {
-  subtask: string;
   details: string;
 }
