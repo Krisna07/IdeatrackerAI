@@ -30,7 +30,7 @@ export default function Home() {
         title: "",
         description: "",
       };
-
+      //Prmopt for the gemini
       const prompt = `based on the title: ${title} and description: ${description} generate a list of subtasks that need to be done to meet the goal. Format it to meet the schema :
       {
       title: "this should be the title of the subtask",
@@ -50,7 +50,7 @@ export default function Home() {
         };
       });
 
-      console.log("Formatted Response Array:", subtasksList);
+      // console.log("Formatted Response Array:", subtasksList);
       return subtasksList;
     } catch (error) {
       console.error("Error parsing response:", error);
@@ -174,6 +174,12 @@ export default function Home() {
   const formVisibilityhandler = (item: boolean) => {
     showIdeaForm(item);
   };
+  useEffect(() => {
+    if (!loading) {
+      formVisibilityhandler(false);
+    }
+  }, [loading]);
+
   return (
     <>
       <Navbar />

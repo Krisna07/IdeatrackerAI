@@ -70,21 +70,71 @@ const SubtaskComponent = ({
     <>
       <motion.div
         key={subtask.id}
-        className="w-full  flex items-start justify-between mb-2 p-2 relative overflow-visible"
+        className="w-full flex items-start justify-between mb-2 py-2 gap-2 relative overflow-visible"
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {subtask.completed && isExploding && (
-          <ConfettiExplosion particleSize={8} force={0.4} />
-        )}
-
-        <input
-          type="checkbox"
-          checked={subtask.completed}
-          onChange={handleToggleSubtask}
-          className="place-self-start m-2 mt-1"
-        />
+        <div
+          className="relative w-fit grid place-items-center "
+          onClick={handleToggleSubtask}
+        >
+          {subtask.completed && isExploding && (
+            <ConfettiExplosion particleSize={8} force={0.4} />
+          )}
+          <svg className="w-[24px] h-[24px] grid place-content-center ">
+            <circle
+              className="text-gray-300"
+              strokeWidth="4"
+              stroke="currentColor"
+              fill="transparent"
+              r="8"
+              cx="12"
+              cy="12"
+            />
+            <motion.circle
+              className="text-blue-600"
+              strokeWidth="2"
+              strokeDasharray="100"
+              strokeDashoffset="100"
+              strokeLinecap="round"
+              stroke="currentColor"
+              fill="transparent"
+              r="8"
+              cx="12"
+              cy="12"
+              initial={{ strokeDashoffset: 100 }}
+              animate={{
+                strokeDashoffset: subtask.completed ? 100 - 100 : 100 - 0,
+              }}
+              transition={{ duration: 1 }}
+            />
+          </svg>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={
+              subtask.completed
+                ? {
+                    scale: 1,
+                  }
+                : {
+                    scale: 0,
+                  }
+            }
+            transition={{
+              type: "spring",
+            }}
+            className="absolute"
+          >
+            <TiTick />
+          </motion.div>
+          {/* <input
+            type="checkbox"
+            checked={subtask.completed}
+            onChange={handleToggleSubtask}
+            className="place-self-start  absolute opacity-0"
+          /> */}
+        </div>
         <div className="w-full grid gap-1 ">
           <div className="flex items-center justify-between gap-2">
             <span

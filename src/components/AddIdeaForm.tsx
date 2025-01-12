@@ -45,12 +45,10 @@ export default function AddIdeaForm({
       const response = await generate(prompt, { title: "", description: "" });
       const correctedTitle = response[0].title;
       const correctedDescription = response[0].description;
-      console.log(response);
 
       onAddIdea(correctedTitle, correctedDescription);
       setTitle("");
       setDescription("");
-      formVisibilityhandler(false);
     } catch (error) {
       console.log(error);
       setFormError("Failed to auto-correct title and description.");
