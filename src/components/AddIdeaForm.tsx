@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import ThreeDotsWave from "./Loaders/Threedotsloading";
+import generate from "../utils/generate";
 
 interface AddIdeaFormProps {
   onAddIdea: (title: string, description: string) => void;
@@ -17,7 +18,7 @@ export default function AddIdeaForm({
   const [description, setDescription] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
       setFormError("Title is required.");
@@ -28,9 +29,29 @@ export default function AddIdeaForm({
       return;
     }
     setFormError(null);
-    onAddIdea(title, description);
-    setTitle("");
-    setDescription("");
+
+    try {
+      const prompt = `Correct the spelling and grammar for the following title and longer description of 15 words description:
+      Title: ${title}
+      Description: ${description}
+      return it in the format:{
+        title: "corrected title",
+        description: "abit longer description of 15 words"
+        }
+      
+      `;
+      const response = await generate(prompt, { title: "", description: "" });
+      const correctedTitle = response[0].title;
+      const correctedDescription = response[0].description;
+      console.log(response);
+
+      onAddIdea(correctedTitle, correctedDescription);
+      setTitle("");
+      setDescription("");
+    } catch (error) {
+      console.log(error);
+      setFormError("Failed to auto-correct title and description.");
+    }
   };
 
   return (

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Idea, Subtask } from "../types";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { TiTick } from "react-icons/ti";
 
 import SubtaskComponent from "./Subtask";
 
@@ -20,23 +19,9 @@ export function IdeaCard({
 }: IdeaCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeSubtask, setActiveSubtask] = useState<number | null>(null);
-  const [visibleBreakdowns, setVisibleBreakdowns] = useState<{
-    [key: number]: boolean;
-  }>({});
 
   const handleSubtaskClick = (subtaskId: number) => {
     setActiveSubtask(activeSubtask === subtaskId ? null : subtaskId);
-  };
-
-  const toggleBreakdownVisibility = (subtaskId: number) => {
-    setVisibleBreakdowns((prev) => ({
-      ...prev,
-      [subtaskId]: !prev[subtaskId],
-    }));
-  };
-
-  const renderBreakdown = (html: string) => {
-    return <div dangerouslySetInnerHTML={{ __html: html }} />;
   };
 
   return (
@@ -79,37 +64,6 @@ export function IdeaCard({
                   onToggleSubtask={onToggleSubtask}
                   handleGenerateBreakdown={onGenerateBreakdown}
                 />
-                {subtask.breakdown && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "fit-content", opacity: 1 }}
-                    className="overflow-hidden mt-4 grid gap-4 p-2 bg-gray-100 rounded"
-                  >
-                    <button
-                      onClick={() => toggleBreakdownVisibility(subtask.id)}
-                      className="w-fit flex items-center bg-blue-600 rounded-md text-sm p-2 py-1 text-white"
-                    >
-                      {visibleBreakdowns[subtask.id]
-                        ? "Hide Breakdown"
-                        : "View Breakdown"}
-                    </button>
-                    {visibleBreakdowns[subtask.id] && (
-                      <>
-                        <h3 className="text-lg font-semibold">Breakdown:</h3>
-                        <div className="text-sm text-gray-700">
-                          {renderBreakdown(subtask.breakdown)}
-                        </div>
-                        <button
-                          onClick={() => onToggleSubtask(idea.id, subtask.id)}
-                          className="w-fit flex items-center bg-blue-600 rounded-md text-sm p-2 py-1 text-white"
-                        >
-                          {subtask.completed && <TiTick />}
-                          Done
-                        </button>
-                      </>
-                    )}
-                  </motion.div>
-                )}
               </motion.div>
             ))}
           </div>

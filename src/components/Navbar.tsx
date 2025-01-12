@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FaUserCircle, FaLightbulb } from "react-icons/fa"; // Using Font Awesome icons
 
 export default function Navbar() {
@@ -7,14 +7,23 @@ export default function Navbar() {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  // window.onclick = (event) => {
+  //   if (
+  //     event.target &&
+  //     dropdownRef.current &&
+  //     !dropdownRef.current.contains(event.target as Node)
+  //   ) {
+  //     setIsDropdownOpen(false);
+  //   }
+  // };
   return (
     <nav className="bg-gray-800 p-4 flex justify-between items-center">
       <div className="flex items-center">
         <FaLightbulb className="text-white text-2xl mr-2" />
         <span className="text-white text-xl font-bold">IdeaTracker</span>
       </div>
-      <div className="relative">
+      <div className="relative" ref={dropdownRef}>
         <FaUserCircle
           className="text-white text-3xl cursor-pointer"
           onClick={toggleDropdown}

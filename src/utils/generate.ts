@@ -26,6 +26,7 @@ export default async function generate(
     throw new Error("No response from Gemini AI");
   }
   const cleanedResponse = text.replace(/```json|```/g, "").trim();
+
   const responseArray = JSON.parse(cleanedResponse);
   //add a logic to check if the responseArray is an array of objects
   if (
