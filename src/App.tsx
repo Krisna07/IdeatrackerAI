@@ -173,10 +173,13 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-8 grid place-items-center">
-        <h1 className="text-4xl font-bold text-center mb-8">
-          Idea Progress Tracker
-        </h1>
+      <div className="container mx-auto px-4 py-8 grid gap-4 place-items-center">
+        <div className="h-fit gap-4 text-center">
+          <h1 className="text-4xl font-bold text-center leading-[150%]">
+            Idea Progress Tracker
+          </h1>
+          <p>Have an idea? Brainstorm with Ideatracker AI. </p>
+        </div>
 
         <AddIdeaForm onAddIdea={addIdea} loading={loading} error={error} />
 

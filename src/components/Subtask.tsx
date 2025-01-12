@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { RiGeminiLine } from "react-icons/ri";
 import { Idea, Subtask } from "../types";
 import ThreeDotsWave from "./Loaders/Threedotsloading";
-import { div } from "framer-motion/client";
+import ConfettiExplosion from "react-confetti-explosion";
 import { TiTick } from "react-icons/ti";
 
 interface SubtaskProps {
@@ -27,6 +27,7 @@ const SubtaskComponent = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const [loading, setLoading] = useState(false);
   const [visibleBreakdowns, setVisibleBreakdowns] = useState<boolean>(false);
+  const [isExploding, setIsExploding] = useState<boolean>(false);
 
   useEffect(() => {
     if (showTooltip) {
@@ -41,7 +42,7 @@ const SubtaskComponent = ({
     if (subtask.breakdown) {
       setLoading(false);
     }
-  }, [idea]);
+  }, [idea, subtask.breakdown]);
 
   const toggleBreakdownVisibility = () => {
     setVisibleBreakdowns(!visibleBreakdowns);
@@ -50,25 +51,38 @@ const SubtaskComponent = ({
   const renderBreakdown = (html: string) => {
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
   };
+
   useEffect(() => {
     if (activeSubtask !== subtask.id) {
       setVisibleBreakdowns(false);
     }
-  }, [activeSubtask]);
+  }, [activeSubtask, subtask.id]);
+
+  const handleToggleSubtask = () => {
+    onToggleSubtask(idea.id, subtask.id);
+    if (!subtask.completed) {
+      setIsExploding(true);
+      setTimeout(() => setIsExploding(false), 3000); // Reset confetti after 3 seconds
+    }
+  };
 
   return (
     <>
       <motion.div
         key={subtask.id}
-        className="w-full flex items-start justify-between mb-2 p-2"
+        className="w-full  flex items-start justify-between mb-2 p-2 relative overflow-visible"
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
+        {subtask.completed && isExploding && (
+          <ConfettiExplosion particleSize={8} force={0.4} />
+        )}
+
         <input
           type="checkbox"
           checked={subtask.completed}
-          onChange={() => onToggleSubtask(idea.id, subtask.id)}
+          onChange={handleToggleSubtask}
           className="place-self-start m-2 mt-1"
         />
         <div className="w-full grid gap-1 ">
@@ -82,7 +96,6 @@ const SubtaskComponent = ({
               onClick={() => handleSubtaskClick(subtask.id)}
             >
               {subtask.title}
-              {/* <motion.div className="w-full h-1 absolute bg-black"></motion.div> */}
             </span>
             <div
               className="relative place-self-start"
@@ -118,29 +131,28 @@ const SubtaskComponent = ({
               <p className="text-sm text-gray-600">{subtask.description}</p>
               {subtask.breakdown && (
                 <motion.div
-                  className={`overflow-hidden mt-4 grid gap-4 p-2 ${
+                  className={`overflow-hidden mt-4 grid gap-4 p-2  ${
                     visibleBreakdowns && "bg-gray-100"
                   } rounded `}
                 >
-                  {visibleBreakdowns && (
-                    <motion.div
-                      style={{ overflow: "hidden" }}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{
-                        height: visibleBreakdowns ? "auto" : 0,
-                        opacity: 1,
-                      }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <h3 className="text-lg font-semibold">Breakdown:</h3>
-                      <div className="text-sm text-gray-700">
-                        {renderBreakdown(subtask.breakdown)}
-                      </div>
-                    </motion.div>
-                  )}
+                  <motion.div
+                    style={{ overflow: "hidden" }}
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{
+                      height: visibleBreakdowns ? "auto" : 0,
+                      opacity: 1,
+                    }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <h3 className="text-lg font-semibold">Breakdown:</h3>
+                    <div className="text-sm text-gray-700">
+                      {renderBreakdown(subtask.breakdown)}
+                    </div>
+                  </motion.div>
+
                   <div className="w-full flex gap-2">
                     <button
-                      onClick={() => onToggleSubtask(idea.id, subtask.id)}
+                      onClick={handleToggleSubtask}
                       className="w-fit flex items-center bg-blue-600 rounded-md text-sm p-2 py-1 text-white"
                     >
                       {subtask.completed && <TiTick />}
