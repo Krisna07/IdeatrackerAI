@@ -7,12 +7,14 @@ interface AddIdeaFormProps {
   onAddIdea: (title: string, description: string) => void;
   loading: boolean;
   error: string | null;
+  formVisibilityhandler: (item: boolean) => void;
 }
 
 export default function AddIdeaForm({
   onAddIdea,
   loading,
   error,
+  formVisibilityhandler,
 }: AddIdeaFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -48,6 +50,7 @@ export default function AddIdeaForm({
       onAddIdea(correctedTitle, correctedDescription);
       setTitle("");
       setDescription("");
+      formVisibilityhandler(false);
     } catch (error) {
       console.log(error);
       setFormError("Failed to auto-correct title and description.");
@@ -55,7 +58,7 @@ export default function AddIdeaForm({
   };
 
   return (
-    <motion.div className="bg-white shadow-[0_0_4px_0_gray] rounded-lg p-6 mb-6 w-full max-w-md">
+    <motion.div className="bg-white shadow-[0_0_4px_0_gray] rounded-lg p-6 mb-6 w-full max-w-md grid gap-2">
       <h2 className="text-2xl font-bold mb-4 text-center">Add New Idea</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -119,6 +122,15 @@ export default function AddIdeaForm({
           </button>
         </div>
       </form>
+      <button
+        type="submit"
+        disabled={loading}
+        onClick={() => formVisibilityhandler(false)}
+        className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-[0_0_4px_0_black] text-sm font-medium
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+      >
+        Cancel
+      </button>
     </motion.div>
   );
 }

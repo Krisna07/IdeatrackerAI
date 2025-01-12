@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import { Idea, Subtask, Breakdown } from "./types";
 import { IdeaCard } from "./components/IdeaCard";
 import generate from "./utils/generate";
+import { PiPlus } from "react-icons/pi";
 
 export default function Home() {
   const [ideas, setIdeas] = useState<Idea[]>(() => {
@@ -14,6 +15,7 @@ export default function Home() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ideaform, showIdeaForm] = useState<boolean>(false);
 
   useEffect(() => {
     localStorage.setItem("ideas", JSON.stringify(ideas));
@@ -170,6 +172,9 @@ export default function Home() {
     }
   };
 
+  const formVisibilityhandler = (item: boolean) => {
+    showIdeaForm(item);
+  };
   return (
     <>
       <Navbar />
@@ -181,7 +186,37 @@ export default function Home() {
           <p>Have an idea? Brainstorm with Ideatracker AI. </p>
         </div>
 
-        <AddIdeaForm onAddIdea={addIdea} loading={loading} error={error} />
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={
+            ideaform ? { scale: 1, height: "auto" } : { scale: 0, height: 0 }
+          }
+          transition={{ type: "keyframes", stiffness: 100 }}
+          className="w-full grid place-items-center"
+        >
+          <AddIdeaForm
+            onAddIdea={addIdea}
+            loading={loading}
+            error={error}
+            formVisibilityhandler={formVisibilityhandler}
+          />
+        </motion.div>
+
+        <div className="relative flex items-center justify-center">
+          <motion.button
+            initial={{ scale: 0 }}
+            animate={
+              !ideaform ? { scale: 1, height: "auto" } : { scale: 0, height: 0 }
+            }
+            transition={{ type: "keyframes", stiffness: 100 }}
+            onClick={() => formVisibilityhandler(true)}
+            className="w-fit flex justify-center items-center  py-2 px-4 border border-transparent rounded-md shadow-[0_0_4px_0_black] text-sm font-medium
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 relative z-10"
+          >
+            Track New Idea
+          </motion.button>
+          {/* <div className="absolute w-[200%] h-[140%] p-2  bg-gradient-to-r from-white  animate-pulse via-emerald-500/50 to-transpare z-0"></div> */}
+        </div>
 
         <AnimatePresence>
           <div
