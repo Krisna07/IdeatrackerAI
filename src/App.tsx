@@ -6,7 +6,6 @@ import Navbar from "./components/Navbar";
 import { Idea, Subtask, Breakdown } from "./types";
 import { IdeaCard } from "./components/IdeaCard";
 import generate from "./utils/generate";
-import { PiPlus } from "react-icons/pi";
 
 export default function Home() {
   const [ideas, setIdeas] = useState<Idea[]>(() => {
