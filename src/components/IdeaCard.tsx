@@ -78,7 +78,7 @@ export function IdeaCard({
               </text>
             </svg>
 
-            <div className="w-full flex items-center justify-between ">
+            <div className="w-full flex items-center gap-8 justify-between ">
               {idea.progress == 100 && (
                 <motion.div
                   onClick={() => setShowConfirm(true)}
