@@ -56,7 +56,7 @@ export default function AddIdeaForm({
   };
 
   return (
-    <motion.div className="bg-white shadow-[0_0_4px_0_gray] rounded-lg p-6 mb-6 w-full max-w-md grid gap-2">
+    <motion.div className="bg-white shadow-[0_0_2px_0_gray]  rounded-lg p-6  w-full max-w-md grid gap-2">
       <h2 className="text-2xl font-bold mb-4 text-center">Add New Idea</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

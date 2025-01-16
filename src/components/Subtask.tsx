@@ -128,12 +128,6 @@ const SubtaskComponent = ({
           >
             <TiTick />
           </motion.div>
-          {/* <input
-            type="checkbox"
-            checked={subtask.completed}
-            onChange={handleToggleSubtask}
-            className="place-self-start  absolute opacity-0"
-          /> */}
         </div>
         <div className="w-full grid gap-1 ">
           <div className="flex items-center justify-between gap-2">
@@ -157,7 +151,9 @@ const SubtaskComponent = ({
                   handleGenerateBreakdown(subtask);
                   setLoading(true);
                 }}
-                className="flex items-center  rounded-md px-2 text-sm relative z-10 shadow-[0_0_2px_0_gray] gap-2"
+                className={`flex items-center  rounded-md px-2 text-sm relative z-10 ${
+                  !loading && "shadow-[0_0_2px_0_gray]"
+                } gap-2`}
               >
                 {loading ? (
                   <ThreeDotsWave />
@@ -177,11 +173,11 @@ const SubtaskComponent = ({
             </div>
           </div>
           {activeSubtask === subtask.id && (
-            <div>
+            <div className="">
               <p className="text-sm text-gray-600">{subtask.description}</p>
               {subtask.breakdown && (
                 <motion.div
-                  className={`overflow-hidden mt-4 grid gap-4 p-2  ${
+                  className={`overflow-hidden grid gap-4   ${
                     visibleBreakdowns && "bg-gray-100"
                   } rounded `}
                 >
@@ -193,6 +189,7 @@ const SubtaskComponent = ({
                       opacity: 1,
                     }}
                     transition={{ duration: 0.5 }}
+                    className=""
                   >
                     <h3 className="text-lg font-semibold">Breakdown:</h3>
                     <div className="text-sm text-gray-700">

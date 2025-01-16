@@ -58,6 +58,11 @@ export default function Home() {
     }
   };
 
+  const removeIdea = async (id: number) => {
+    const restIdeas: Idea[] = ideas.filter((idea) => idea.id != id);
+    setIdeas(restIdeas);
+  };
+
   const addIdea = async (title: string, description: string) => {
     if (!title.trim()) {
       setError("Please enter a title");
@@ -192,36 +197,41 @@ export default function Home() {
         </div>
 
         <motion.div
-          initial={{ scale: 0 }}
-          animate={
-            ideaform ? { scale: 1, height: "auto" } : { scale: 0, height: 0 }
-          }
-          transition={{ type: "keyframes", stiffness: 100 }}
-          className="w-full grid place-items-center"
+          className={`w-full h-fit relative grid place-items-center ${
+            !ideaform && "overflow-hidden"
+          } p-1`}
         >
-          <AddIdeaForm
-            onAddIdea={addIdea}
-            loading={loading}
-            error={error}
-            formVisibilityhandler={formVisibilityhandler}
-          />
-        </motion.div>
-
-        <div className="relative flex items-center justify-center">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={
+              ideaform
+                ? { scale: 1, position: "relative" }
+                : { scale: 0, position: "absolute" }
+            }
+            transition={{ type: "spring", stiffness: 100 }}
+            className="w-full top-0 grid place-items-center p-2 z-20   "
+          >
+            <AddIdeaForm
+              onAddIdea={addIdea}
+              loading={loading}
+              error={error}
+              formVisibilityhandler={formVisibilityhandler}
+            />
+          </motion.div>
           <motion.button
             initial={{ scale: 0 }}
             animate={
-              !ideaform ? { scale: 1, height: "auto" } : { scale: 0, height: 0 }
+              !ideaform
+                ? { scale: 1, position: "relative" }
+                : { scale: 0, position: "absolute" }
             }
-            transition={{ type: "keyframes", stiffness: 100 }}
+            transition={{ type: "spring", stiffness: 100 }}
             onClick={() => formVisibilityhandler(true)}
-            className="w-fit flex justify-center items-center  py-2 px-4 border border-transparent rounded-md shadow-[0_0_4px_0_black] text-sm font-medium
-            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 relative z-10"
+            className="w-fit  p-2 px-4 rounded-md shadow-[0_0_2px_0_gray] z-10"
           >
             Track New Idea
           </motion.button>
-          {/* <div className="absolute w-[200%] h-[140%] p-2  bg-gradient-to-r from-white  animate-pulse via-emerald-500/50 to-transpare z-0"></div> */}
-        </div>
+        </motion.div>
 
         <AnimatePresence>
           <div
@@ -241,6 +251,7 @@ export default function Home() {
                 transition={{ duration: 0.5 }}
               >
                 <IdeaCard
+                  removeIdea={removeIdea}
                   idea={idea}
                   onToggleSubtask={toggleSubtask}
                   onGenerateBreakdown={generateBreakdown}
