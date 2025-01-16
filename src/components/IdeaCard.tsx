@@ -29,7 +29,7 @@ export function IdeaCard({
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 100 }}
-      className="bg-white h-full shadow-[0_0_2px_0_gray] rounded-lg p-6 mb-6 min-w-full max-w-lg"
+      className="bg-white h-fit shadow-[0_0_2px_0_gray] rounded-lg p-6 mb-6 min-w-full max-w-lg"
     >
       <div className="flex justify-between items-center">
         <div>
