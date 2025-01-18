@@ -1,6 +1,6 @@
 # IdeaTracker AI
 
-IdeaTracker AI is a web application that helps you track the progress of your ideas by breaking them down into manageable subtasks. It uses Google Generative AI to generate detailed breakdowns and subtasks for your ideas.
+IdeaTracker AI is a web application that helps you track the progress of your ideas by breaking them down into manageable subtasks. It uses Google Generative AI to generate detailed breakdowns and subtasks for your ideas. The application also integrates with Supabase for user authentication and idea storage.
 
 ## Features
 
@@ -9,7 +9,8 @@ IdeaTracker AI is a web application that helps you track the progress of your id
 - Generate detailed subtasks for each idea using Google Generative AI.
 - Track the progress of each idea and its subtasks.
 - View detailed breakdowns of each subtask.
-- Save and load ideas from local storage.
+- Save and load ideas from Supabase.
+- User authentication with email/password and Google OAuth.
 
 ## Technologies Used
 
@@ -19,6 +20,7 @@ IdeaTracker AI is a web application that helps you track the progress of your id
 - Framer Motion
 - Tailwind CSS
 - Google Generative AI
+- Supabase
 
 ## Getting Started
 
@@ -44,10 +46,12 @@ npm install
 yarn install
 ```
 
-3. Create a `.env` file in the root directory and add your Google Generative AI API key:
+3. Create a `.env` file in the root directory and add your API keys:
 
 ```properties
-VITE_GEMINI_API_KEY=your_api_key_here
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+VITE_SUPABASE_URL=your_supabase_url_here
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 ```
 
 ### Running the Application

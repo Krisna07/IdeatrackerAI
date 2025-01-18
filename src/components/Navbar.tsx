@@ -31,16 +31,16 @@ export default function Navbar() {
         {isDropdownOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
             <a
-              href="#"
+              href="/signin"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Sign In
             </a>
             <a
-              href="#"
+              href="/signup"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              Sign Out
+              Sign up
             </a>
           </div>
         )}

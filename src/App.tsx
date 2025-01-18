@@ -35,6 +35,7 @@ export default function Home() {
       {
       title: "this should be the title of the subtask",
       description: "this should be the description of the subtask",
+      dueDate:"due date just for the record so the  user could match to meet the goal keep it more relevent"
       }
       `;
       const response = await generate(prompt, SubtaskObject);

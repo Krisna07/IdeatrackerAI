@@ -38,7 +38,12 @@ export function IdeaCard({
       >
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold capitalize">{idea.title}</h2>
+            <h2 className="text-2xl font-bold capitalize">
+              {idea.title}{" "}
+              <span className="text-sm text-gray-500">
+                {idea.dateCreated && new Date(idea.dateCreated).toDateString()}
+              </span>
+            </h2>
             <p className="text-gray-600 mt-2">{idea.description}</p>
           </div>
           <div className="grid place-content-center">

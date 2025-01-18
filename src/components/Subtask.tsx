@@ -131,7 +131,7 @@ const SubtaskComponent = ({
         <div className="w-full grid gap-1 ">
           <div className="flex items-center justify-between gap-2">
             <span
-              className={`font-semibold relative flex items-center leading-4 ${
+              className={`font-semibold relative grid items-center gap-2 text-center leading-4  ${
                 subtask.completed
                   ? "line-through text-gray-400"
                   : "text-gray-800"
@@ -139,7 +139,15 @@ const SubtaskComponent = ({
               onClick={() => handleSubtaskClick(subtask.id)}
             >
               {subtask.title}
+              <span
+                className={`w-fit text-[10px] rounded-full px-2 p-0 bg-gray-200 ring-1 ${
+                  new Date() < subtask.dueDate && "ring-red-500"
+                }`}
+              >
+                {new Date(subtask.dueDate).toDateString()}
+              </span>
             </span>
+
             <div
               className="relative place-self-start"
               onMouseEnter={() => setShowTooltip(true)}
