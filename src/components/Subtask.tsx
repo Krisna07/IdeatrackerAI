@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-
 import { RiGeminiLine } from "react-icons/ri";
 import { Idea, Subtask } from "../types";
 import ThreeDotsWave from "./Loaders/Threedotsloading";
@@ -10,9 +9,9 @@ import { TiTick } from "react-icons/ti";
 interface SubtaskProps {
   idea: Idea;
   subtask: Subtask;
-  activeSubtask: number | null;
-  onToggleSubtask: (ideaId: number, subtaskId: number) => void;
-  handleSubtaskClick: (subtaskId: number) => void;
+  activeSubtask: string | null;
+  onToggleSubtask: (ideaId: string, subtaskId: string) => void;
+  handleSubtaskClick: (subtaskId: string) => void;
   handleGenerateBreakdown: (subtask: Subtask) => void;
 }
 

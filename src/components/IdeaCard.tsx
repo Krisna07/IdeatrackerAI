@@ -8,10 +8,10 @@ import Confirm from "./Confirm";
 
 interface IdeaCardProps {
   idea: Idea;
-  onToggleSubtask: (ideaId: number, subtaskId: number) => void;
+  onToggleSubtask: (ideaId: string, subtaskId: string) => void;
   onGenerateBreakdown: (subtask: Subtask) => Promise<void>;
   breakdown?: string;
-  removeIdea: (id: number) => void;
+  removeIdea: (id: string) => void;
 }
 
 export function IdeaCard({
@@ -21,10 +21,10 @@ export function IdeaCard({
   removeIdea,
 }: IdeaCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [activeSubtask, setActiveSubtask] = useState<number | null>(null);
+  const [activeSubtask, setActiveSubtask] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleSubtaskClick = (subtaskId: number) => {
+  const handleSubtaskClick = (subtaskId: string) => {
     setActiveSubtask(activeSubtask === subtaskId ? null : subtaskId);
   };
 

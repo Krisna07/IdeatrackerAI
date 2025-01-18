@@ -1,18 +1,25 @@
 export interface Subtask {
-  id: number;
-  ideaId: number;
+  id: string;
+
+  ideaId: string;
+
   title: string;
-  completed: boolean;
+
   description: string;
+
+  dueDate: Date;
+
+  completed: boolean;
   breakdown?: string | null;
 }
 
 export interface Idea {
-  id: number;
+  id: string;
   title: string;
   description: string;
   status: "Not Started" | "In Progress" | "Completed";
   progress: number;
+  dateCreated?: Date;
   subtasks: Subtask[];
 }
 

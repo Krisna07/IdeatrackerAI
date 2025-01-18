@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { v4 as uuidv4 } from "uuid";
 import AddIdeaForm from "./components/AddIdeaForm";
 import Navbar from "./components/Navbar";
 import { Idea, Subtask, Breakdown } from "./types";
@@ -23,7 +23,7 @@ export default function Home() {
   const generateSubtasks = async (
     title: string,
     description: string,
-    ideaId: number
+    ideaId: string
   ): Promise<Subtask[]> => {
     try {
       const SubtaskObject: { title: string; description: string } = {
@@ -40,17 +40,17 @@ export default function Home() {
       const response = await generate(prompt, SubtaskObject);
 
       const subtasksList: Subtask[] = response.map((item: Subtask) => {
-        const { title, description = "" } = item;
+        const { title, description = "", dueDate = new Date() } = item;
+
         return {
           ideaId: ideaId,
-          id: Math.floor(Math.random() * 100000),
+          id: uuidv4(),
           title,
           description,
+          dueDate,
           completed: false,
         };
       });
-
-      // console.log("Formatted Response Array:", subtasksList);
       return subtasksList;
     } catch (error) {
       console.error("Error parsing response:", error);
@@ -58,8 +58,8 @@ export default function Home() {
     }
   };
 
-  const removeIdea = async (id: number) => {
-    const restIdeas: Idea[] = ideas.filter((idea) => idea.id != id);
+  const removeIdea = async (id: string) => {
+    const restIdeas: Idea[] = ideas.filter((idea) => idea.id !== id);
     setIdeas(restIdeas);
   };
 
@@ -73,7 +73,7 @@ export default function Home() {
     setError(null);
 
     try {
-      const ideaId = Math.floor(Math.random() * 356662);
+      const ideaId = uuidv4();
       const subtasks: Subtask[] = await generateSubtasks(
         title,
         description,
@@ -88,6 +88,7 @@ export default function Home() {
           description,
           status: "Not Started",
           progress: 0,
+          dateCreated: new Date(),
           subtasks,
         },
       ]);
@@ -100,7 +101,7 @@ export default function Home() {
     }
   };
 
-  const toggleSubtask = (ideaId: number, subtaskId: number) => {
+  const toggleSubtask = (ideaId: string, subtaskId: string) => {
     setIdeas(
       ideas.map((idea) => {
         if (idea.id === ideaId) {
@@ -134,7 +135,7 @@ export default function Home() {
     Give a breakdown of the subtask: ${subtask.title}.
     based on the subtask: ${subtask.title} generate a detailed breakdown of the steps required to complete it. Format the response to meet the schema:
     {
-      details: "this should be a detailed breakdown of the subtask formatted as html just write inside a <div>  with headings, list and paragraphs use tailwind css to make it look better"
+      details: "this should be a detailed breakdown of the subtask formatted as html just write inside a <div> with headings, list and paragraphs use tailwind css to make it look better. Use the following styling. <h2 className="text-lg font-semibold first-letter:uppercase"> <p classname="leading-[120%]"> "
     }
     `;
     const breakDownObject: { details: string } = { details: "" };
@@ -218,19 +219,25 @@ export default function Home() {
               formVisibilityhandler={formVisibilityhandler}
             />
           </motion.div>
-          <motion.button
+          <motion.div
             initial={{ scale: 0 }}
             animate={
-              !ideaform
-                ? { scale: 1, position: "relative" }
-                : { scale: 0, position: "absolute" }
+              !ideaform ? { scale: 1 } : { scale: 0, position: "absolute" }
             }
-            transition={{ type: "spring", stiffness: 100 }}
-            onClick={() => formVisibilityhandler(true)}
-            className="w-fit  p-2 px-4 rounded-md shadow-[0_0_2px_0_gray] z-10"
+            className="w-fit relative p-[2px] rounded-[4px] overflow-hidden grid place-items-center ring-1 hover:ring-0 transition-all ease-in-out"
           >
-            Track New Idea
-          </motion.button>
+            <motion.div
+              animate={{ rotate: [0, 180, 360] }}
+              transition={{ duration: 3, repeat: Infinity }}
+              className="w-[400%] h-[400%] rounded-full  bg-gradient-to-r from-blue-800 via-transparent  to-green-600 absolute  "
+            ></motion.div>
+            <motion.button
+              onClick={() => formVisibilityhandler(true)}
+              className="w-fit  p-2 px-4 rounded-[3px]  hover:scale-[1.01] relative bg-white  transition-all ease-in-out z-10"
+            >
+              Track New Idea
+            </motion.button>
+          </motion.div>
         </motion.div>
 
         <AnimatePresence>

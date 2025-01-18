@@ -1,8 +1,8 @@
 import React from "react";
 
 interface ConfirmProps {
-  id: number;
-  removeIdea: (id: number) => void;
+  id: string;
+  removeIdea: (id: string) => void;
   onClose: () => void;
 }
 
