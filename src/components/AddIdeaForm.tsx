@@ -7,6 +7,7 @@ interface AddIdeaFormProps {
   onAddIdea: (title: string, description: string) => void;
   loading: boolean;
   error: string | null;
+  ideaform: boolean;
   formVisibilityhandler: (item: boolean) => void;
 }
 
@@ -14,6 +15,7 @@ export default function AddIdeaForm({
   onAddIdea,
   loading,
   error,
+  ideaform,
   formVisibilityhandler,
 }: AddIdeaFormProps) {
   const [title, setTitle] = useState("");
@@ -36,6 +38,7 @@ export default function AddIdeaForm({
       const prompt = `Correct the spelling and grammar for the following title and longer description of 15 words description:
       Title: ${title}
       Description: ${description}
+   
       return it in the format:{
         title: "corrected title",
         description: "abit longer description of 15 words"
@@ -56,79 +59,112 @@ export default function AddIdeaForm({
   };
 
   return (
-    <motion.div className="bg-white shadow-[0_0_2px_0_gray]  rounded-lg p-6  w-full max-w-md grid gap-2">
-      <h2 className="text-2xl font-bold mb-4 text-center">Add New Idea</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Title
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Description
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            rows={4}
-          />
-        </div>
-        {formError && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="text-red-500 text-sm"
+    <div
+      className={`w-fit relative grid place-items-center overflow-hidden ${
+        loading ? "p-[4px]" : "p-[2px]"
+      } rounded-lg`}
+    >
+      <motion.div
+        className={` ${
+          ideaform ? "w-[400px] p-6 ring-1 ring-blue-300" : "w-fit px-4 p-2 "
+        } bg-white z-10 shadow-[0_0_2px_0_gray]  rounded-lg  relative  max-w-md grid place-items-center gap-2 transition-all ease-in-out overflow-hidden`}
+      >
+        {" "}
+        {ideaform ? (
+          <h2 className="text-2xl font-bold  text-center  ">Add New Idea</h2>
+        ) : (
+          <h2
+            onClick={() => formVisibilityhandler(true)}
+            className="text-2xl font-bold  text-center cursor-pointer "
           >
-            {formError}
-          </motion.div>
+            Track new idea
+          </h2>
         )}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="text-red-500 text-sm"
-          >
-            {error}
-          </motion.div>
-        )}
-        <div>
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-              loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-          >
-            {loading ? (
-              <div className="rounded-full flex items-center gap-2">
-                Generating
-                <ThreeDotsWave />
-              </div>
-            ) : (
-              "Add Idea"
+        <div
+          className={`${
+            !ideaform ? "h-0 absolute bottom-0 w-0" : "h-fit w-full "
+          } grid  z-10  gap-2 transition-all ease-in-out`}
+        >
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Title
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                rows={4}
+              />
+            </div>
+            {formError && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="text-red-500 text-sm"
+              >
+                {formError}
+              </motion.div>
             )}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="text-red-500 text-sm"
+              >
+                {error}
+              </motion.div>
+            )}
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+                  loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+              >
+                {loading ? (
+                  <div className="rounded-full flex items-center gap-2">
+                    Generating
+                    <ThreeDotsWave />
+                  </div>
+                ) : (
+                  "Add Idea"
+                )}
+              </button>
+            </div>
+          </form>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() => formVisibilityhandler(false)}
+            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-[0_0_4px_0_black] text-sm font-medium
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+          >
+            Cancel
           </button>
         </div>
-      </form>
-      <button
-        type="submit"
-        disabled={loading}
-        onClick={() => formVisibilityhandler(false)}
-        className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-[0_0_4px_0_black] text-sm font-medium
-            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-      >
-        Cancel
-      </button>
-    </motion.div>
+      </motion.div>
+
+      <motion.div
+        initial={{ rotate: 0 }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 3, repeat: Infinity }}
+        className="w-[400%] h-[400%] rounded-full  bg-gradient-to-r from-blue-800 via-transparent  to-green-600 absolute z-0  "
+      ></motion.div>
+    </div>
   );
 }
