@@ -6,6 +6,7 @@ import generate from "../utils/generate";
 import AddIdeaForm from "../components/AddIdeaForm";
 import { IdeaCard } from "../components/IdeaCard";
 
+
 export default function Home() {
   const [ideas, setIdeas] = useState<Idea[]>(() => {
     const savedIdeas = localStorage.getItem("ideas");
@@ -15,8 +16,11 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [ideaform, showIdeaForm] = useState<boolean>(false);
 
+
+  
   useEffect(() => {
     localStorage.setItem("ideas", JSON.stringify(ideas));
+
   }, [ideas]);
 
   const generateSubtasks = async (

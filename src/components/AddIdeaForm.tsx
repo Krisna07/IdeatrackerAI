@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import ThreeDotsWave from "./Loaders/Threedotsloading";
 import generate from "../utils/generate";
@@ -57,6 +57,14 @@ export default function AddIdeaForm({
       setFormError("Failed to auto-correct title and description.");
     }
   };
+
+  useEffect(()=>{
+    const clearError = setInterval(()=>{
+      setFormError('')
+    }, 10000)
+
+    return ()=>clearInterval(clearError) 
+  }, [error])
 
   return (
     <div
