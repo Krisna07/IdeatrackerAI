@@ -10,19 +10,25 @@ const SignUp: React.FC = () => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+ if(email && password ){
+  const { data, error } = await supabase
+  .from('users')
+  .insert([
+    { username: email, password: password },
+  ])
+  .select()
+  console.log(data)
+  if (error) {
+    setError(error.message);
+  } else {
+    setSuccess(
+      "Sign up successful! Please check your email to confirm your account."
+    );
+  }
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+ }
 
-    if (error) {
-      setError(error.message);
-    } else {
-      setSuccess(
-        "Sign up successful! Please check your email to confirm your account."
-      );
-    }
+    
   };
 
   return (
